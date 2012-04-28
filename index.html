@@ -1,0 +1,283 @@
+
+<!DOCTYPE html> 
+<html> 
+ 
+<head> 
+	<meta charset="utf-8"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Mobile Development Finale</title> 
+	<link type="text/css" rel="stylesheet" href="css/jquery.css" /> 
+  <link type="text/css" rel="stylesheet" href="css/myApp.css" /> 
+  <link type="text/css" rel="stylesheet" href="css/survey.css" /> 
+  <link type="text/css" rel="stylesheet" href="css/custom-theme/jquery-ui-1.8.16.custom.css"/>	
+  
+  <script src='js/Survey.js' type='text/javascript'></script> 
+  <script src="js/jquery-1.6.2.min.js"></script>
+  <script src="js/jquery-ui-1.8.16.custom.min.js"></script>
+  <script src="js/youtube.js"></script> 
+	<script src="js/jqueryMobile.js"></script> 
+  <script src="js/myApp.js"></script> 
+  
+  <script>              
+      $(document).ready(function() {
+        var dropped = false;
+        var draggable_sibling;
+  
+        $("#surveyElements").sortable({
+            start: function(event, ui) {
+                draggable_sibling = $(ui.item).prev();
+            },
+            stop: function(event, ui) {
+                if (dropped) {
+                    if (draggable_sibling.length == 0)
+                        $('#surveyElements').prepend(ui.item);
+
+                    draggable_sibling.after(ui.item);
+                    dropped = false;
+                }
+            }
+        });
+
+        $(".droppable").droppable({
+            activeClass: 'active',
+            hoverClass:'hovered',
+            drop:function(event,ui){
+                dropped = true;
+                var id = ui.draggable.attr('id');  
+                Survey.emptyPreview(id);
+            }
+        });
+        
+        $( "#tabs" ).tabs({
+          collapsible: true
+        });
+        
+        
+        $("button").button();
+        
+        $( "#dialog:ui-dialog" ).dialog( "destroy" );
+	
+        $( "#dialog-modal" ).dialog({
+          autoOpen: false,
+          height: 140,
+          modal: true
+        });
+        
+        $( "#opener" ).click(function() {
+        	$( "#dialog-modal" ).dialog( "open" );
+          return false;
+        });
+      });
+        
+      //for footer
+      var myDate = new Date();
+      var displayDate = (myDate.getMonth()+1) + '/' + (myDate.getDate()) + '/' + myDate.getFullYear();
+
+</script>
+ </head> 
+ <body>
+ 
+<!--                                    Start of first page: #home --> 
+<div data-role="page" id="home"> 
+ 
+	<div data-role="header"> 
+		<h1>Mobile Development Final</h1> 
+	</div><!-- /header --> 
+ 
+	<div data-role="content" >	
+		<h2>Home</h2> 
+		
+		<P>Welcome to my project Home page</p>
+    <p>This is a jquery mobile application written in mostly jquery, jqueryMobile, javascript with a youtube HTML5 application sample</p>
+		<h3>Go To:</h3> 
+		<p><a href="#two" data-role="button">Survey</a></p>	
+    <p><a href="#three" data-role="button">Youtube Example</a></p>	
+		<p><a href="#popup" data-role="button" data-rel="dialog" data-transition="pop">About Me</a></p> 
+	</div><!-- /content --> 
+	
+	<div data-role="footer"> 
+		<h4>
+    <script>
+    document.write(displayDate);
+    </script>
+    </h4> 
+	</div><!-- /footer --> 
+</div><!-- /page one --> 
+ 
+ 
+<!--                                     Start of second page: #two --> 
+<div data-role="page" id="two"> 
+ 
+	<div data-role="header"> 
+		<h1>Mobile Development Final</h1>  
+	</div><!-- /header --> 
+ 
+ 
+  <!--
+    This is a build your own survey app, it supports radio buttons/Text boxes with questions
+    And inserting spaces. 
+    You can drag and drop the questions to reorder and to delete them.
+    -->
+	<div data-role="content" >	
+		<h2>Survey Builder</h2> 
+    <div id="tabs">
+        <ul>
+          <li><a href="#radioTab">Radio Button</a></li>
+          <li><a href="#textTab">Text Box</a></li>
+          <li><a href="#spaceTab">Space Box</a></li>
+        </ul>
+      
+        <div class='tab' id='radioTab'>
+          
+          <div class='control'>
+              <input type="text" name="Question" value="Question Text" id='radioQuestionText' />
+              <input type='button' onclick="Survey.addQuestion(this,'radio')" value='add Radio Button'/>          
+          </div>
+          
+          <div class='control'>            
+            <input type="text" name="Radio Button" value="Radio Button Value" id="radioValue"/>
+            <input type="text" name="Radio Button" value="Radio Button Text"  id="radioText"/>
+            <input type='button' onclick="Survey.addValue(this, 'radio')" value='add value'/>            
+          </div>
+          
+        </div>  
+        
+        <div class='tab' id='textTab'>
+          <div class='control'>
+              <input type="text" name="Question" value="Question Text" id='textQuestionText' />
+              <input type='button' onclick="Survey.addQuestion(this,'text')" value='Add Text Box'/>          
+          </div>
+          
+          <div class='control'>            
+            <input type="text" name="text Button" value="text Button Text"  id="textText"/>
+            <input type='button' onclick="Survey.addValue(this, 'text')" value='add value'/>            
+          </div>
+        </div>
+        <div class='tab' id='spaceTab'>
+          <input type='button' onclick="Survey.addValue(this, 'space')" value='add space'/>  
+        </div>
+        
+      </div>
+      
+      <div class='model'>
+        <center>
+            <div id='previewToSurvey'>
+              <input type='button' onclick="Survey.addPreview(this)" value='add Preview to survey'/>
+            </div>
+            
+            
+        </center>
+            
+        <div id='preview'>
+                  
+        </div>
+      </div>
+      
+             
+      <div id='questions'>
+        <div id='survey'>
+          <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Survey</h1>
+          <ul id="surveyElements" class="connectedSortable">
+      
+          </ul>
+        </div>
+        
+        <div class="droppable" id='garbage'>     
+            <h1>Garbage</h1>
+            Drop questions here to delete
+            
+        </div>
+          
+        
+      </div>
+
+   
+	</div><!-- /content --> 
+	
+	<div data-role="footer"> 
+    
+		<h4>
+    <!-- /back button -->
+		<a href="#home" data-direction="reverse" data-role="button" data-theme="b">Back to Home</a>
+		<br>
+    <script>
+    document.write(displayDate);
+    </script>
+    </h4> 
+	</div><!-- /footer --> 
+</div><!-- /page two --> 
+
+<!--                                     Start of second page: #Three --> 
+<div data-role="page" id="three"> 
+ 
+	<div data-role="header"> 
+		<h1>Mobile Development Final</h1>  
+	</div><!-- /header --> 
+ 
+	<div data-role="content" >	
+		<h2>Youtube Player</h2> 
+		<!-- 1. The <div> tag will contain the <iframe> (and video player) -->
+    <center>
+    
+      <div id="player"></div>
+
+       <p>Controls: <a href="javascript:void(0);" onclick="playVideo();">Play</a> | <a href="javascript:void(0);" onclick="pauseVideo();">Pause</a> | <a href="javascript:void(0);" onclick="muteVideo();">Mute</a> | <a href="javascript:void(0);" onclick="unMuteVideo();">Unmute</a></p>
+        <FORM NAME = frmOne>
+          <INPUT TYPE = Text NAME = urlText SIZE = 20 value ="u1zgFlCw8Aw">
+          <Input Type = Button NAME = load VALUE = "load Video" onClick = loadVideo()>
+        </FORM>
+
+      <div id="videoInformation">
+        <p>Player state: <span id="playerState">--</span></p>
+        <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
+      </div>
+
+    </center>
+  
+	</div><!-- /content --> 
+	
+	<div data-role="footer"> 
+		<h4>
+      <!-- /back button -->
+		<a href="#home" data-direction="reverse" data-role="button" data-theme="b" onclick="stopVideo();">Back to Home</a>		
+    <br>
+    <script>
+    document.write(displayDate);
+    </script>
+    </h4> 
+	</div><!-- /footer --> 
+</div><!-- /page three --> 
+ 
+ 
+<!-- Start of page: #popup --> 
+<div data-role="page" id="popup"> 
+ 
+	<div data-role="header" data-theme="e"> 
+		<h1>About Me</h1> 
+	</div><!-- /header --> 
+ 
+	<div data-role="content" data-theme="d" >	
+		<p>Made by Mitchell DeMarco</p>
+    <p>For Programming Skills: Mobile Devices</p>
+    <p>With help from<br>
+      <a href="http://jquerymobile.com/">Jquery Mobile</a><br>
+      <a href="http://code.google.com/apis/youtube/overview.html">Youtube API</a><br>
+      
+   
+	</div><!-- /content --> 
+	
+	<div data-role="footer"> 
+		<h4>
+     <!-- /back button -->
+		<a href="#home" data-direction="reverse" data-role="button" data-theme="b">Back to Home</a>		
+    <br>
+    <script>
+    document.write(displayDate);
+    </script>
+    </h4> 
+    
+	</div><!-- /footer --> 
+</div><!-- /page popup --> 
+ 
+</body> 
+</html> 
